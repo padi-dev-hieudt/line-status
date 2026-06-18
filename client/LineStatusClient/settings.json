@@ -1,0 +1,7 @@
+{
+  "ServerName": "IS-HN-L332",
+  "DatabaseName": "CallASSYDB",
+  "UserName": "sa",
+  "Password": "Admin@123",
+  "Extra": "TrustServerCertificate=True"
+}

@@ -1,0 +1,7 @@
+{
+  "ServerName": "172.17.132.28",
+  "DatabaseName": "CallASSYDB",
+  "UserName": "user",
+  "Password": "12345678",
+  "Extra": "TrustServerCertificate=True"
+}
