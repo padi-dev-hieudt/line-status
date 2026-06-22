@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.pnlHeader = new DevExpress.XtraEditors.PanelControl();
+            this.cboDisplayDataType = new System.Windows.Forms.ComboBox();
             this.btnRefesh = new DevExpress.XtraEditors.SimpleButton();
             this.label5 = new System.Windows.Forms.Label();
             this.grdMain = new DevExpress.XtraGrid.GridControl();
@@ -49,14 +50,14 @@
             this.mnitemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.pnlFooter = new DevExpress.XtraEditors.PanelControl();
-            this.label4 = new System.Windows.Forms.Label();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.eldowntime_08 = new System.Windows.Forms.Label();
+            this.eldowntime_07 = new System.Windows.Forms.TextBox();
+            this.eldowntime_06 = new System.Windows.Forms.Label();
+            this.eldowntime_05 = new System.Windows.Forms.TextBox();
+            this.eldowntime_04 = new System.Windows.Forms.Label();
+            this.eldowntime_03 = new System.Windows.Forms.TextBox();
+            this.eldowntime_02 = new System.Windows.Forms.Label();
+            this.eldowntime_01 = new System.Windows.Forms.TextBox();
             this.btnSetting = new DevExpress.XtraEditors.SimpleButton();
             this.flyoutPanel1 = new DevExpress.Utils.FlyoutPanel();
             this.btnShift = new DevExpress.XtraEditors.SimpleButton();
@@ -64,6 +65,8 @@
             this.btnHistory = new DevExpress.XtraEditors.SimpleButton();
             this.btnRunAtStartup = new DevExpress.XtraEditors.SimpleButton();
             this.btnHide = new DevExpress.XtraEditors.SimpleButton();
+            this.elcalltime_02 = new System.Windows.Forms.Label();
+            this.elcalltime_01 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdMain)).BeginInit();
@@ -80,6 +83,7 @@
             this.pnlHeader.Appearance.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.pnlHeader.Appearance.Options.UseBackColor = true;
             this.pnlHeader.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.pnlHeader.Controls.Add(this.cboDisplayDataType);
             this.pnlHeader.Controls.Add(this.btnRefesh);
             this.pnlHeader.Controls.Add(this.label5);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
@@ -87,6 +91,17 @@
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Size = new System.Drawing.Size(1430, 60);
             this.pnlHeader.TabIndex = 0;
+            // 
+            // cboDisplayDataType
+            // 
+            this.cboDisplayDataType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboDisplayDataType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboDisplayDataType.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cboDisplayDataType.FormattingEnabled = true;
+            this.cboDisplayDataType.Location = new System.Drawing.Point(1144, 12);
+            this.cboDisplayDataType.Name = "cboDisplayDataType";
+            this.cboDisplayDataType.Size = new System.Drawing.Size(224, 27);
+            this.cboDisplayDataType.TabIndex = 2;
             // 
             // btnRefesh
             // 
@@ -317,14 +332,16 @@
             this.pnlFooter.Appearance.BackColor = System.Drawing.Color.White;
             this.pnlFooter.Appearance.Options.UseBackColor = true;
             this.pnlFooter.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
-            this.pnlFooter.Controls.Add(this.label4);
-            this.pnlFooter.Controls.Add(this.textBox4);
-            this.pnlFooter.Controls.Add(this.label3);
-            this.pnlFooter.Controls.Add(this.textBox3);
-            this.pnlFooter.Controls.Add(this.label2);
-            this.pnlFooter.Controls.Add(this.textBox2);
-            this.pnlFooter.Controls.Add(this.label1);
-            this.pnlFooter.Controls.Add(this.textBox1);
+            this.pnlFooter.Controls.Add(this.elcalltime_02);
+            this.pnlFooter.Controls.Add(this.elcalltime_01);
+            this.pnlFooter.Controls.Add(this.eldowntime_08);
+            this.pnlFooter.Controls.Add(this.eldowntime_07);
+            this.pnlFooter.Controls.Add(this.eldowntime_06);
+            this.pnlFooter.Controls.Add(this.eldowntime_05);
+            this.pnlFooter.Controls.Add(this.eldowntime_04);
+            this.pnlFooter.Controls.Add(this.eldowntime_03);
+            this.pnlFooter.Controls.Add(this.eldowntime_02);
+            this.pnlFooter.Controls.Add(this.eldowntime_01);
             this.pnlFooter.Controls.Add(this.btnSetting);
             this.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlFooter.Location = new System.Drawing.Point(0, 635);
@@ -332,97 +349,97 @@
             this.pnlFooter.Size = new System.Drawing.Size(1430, 45);
             this.pnlFooter.TabIndex = 2;
             // 
-            // label4
+            // eldowntime_08
             // 
-            this.label4.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(1363, 13);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(52, 20);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "Dừng";
+            this.eldowntime_08.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eldowntime_08.AutoSize = true;
+            this.eldowntime_08.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.eldowntime_08.Location = new System.Drawing.Point(1363, 13);
+            this.eldowntime_08.Name = "eldowntime_08";
+            this.eldowntime_08.Size = new System.Drawing.Size(52, 20);
+            this.eldowntime_08.TabIndex = 2;
+            this.eldowntime_08.Text = "Dừng";
             // 
-            // textBox4
+            // eldowntime_07
             // 
-            this.textBox4.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.textBox4.BackColor = System.Drawing.Color.OrangeRed;
-            this.textBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox4.Location = new System.Drawing.Point(1324, 8);
-            this.textBox4.Multiline = true;
-            this.textBox4.Name = "textBox4";
-            this.textBox4.ReadOnly = true;
-            this.textBox4.Size = new System.Drawing.Size(35, 30);
-            this.textBox4.TabIndex = 1;
+            this.eldowntime_07.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eldowntime_07.BackColor = System.Drawing.Color.OrangeRed;
+            this.eldowntime_07.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.eldowntime_07.Location = new System.Drawing.Point(1324, 8);
+            this.eldowntime_07.Multiline = true;
+            this.eldowntime_07.Name = "eldowntime_07";
+            this.eldowntime_07.ReadOnly = true;
+            this.eldowntime_07.Size = new System.Drawing.Size(35, 30);
+            this.eldowntime_07.TabIndex = 1;
             // 
-            // label3
+            // eldowntime_06
             // 
-            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
-            this.label3.Location = new System.Drawing.Point(1257, 13);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(45, 20);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Nghỉ";
+            this.eldowntime_06.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eldowntime_06.AutoSize = true;
+            this.eldowntime_06.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+            this.eldowntime_06.Location = new System.Drawing.Point(1257, 13);
+            this.eldowntime_06.Name = "eldowntime_06";
+            this.eldowntime_06.Size = new System.Drawing.Size(45, 20);
+            this.eldowntime_06.TabIndex = 2;
+            this.eldowntime_06.Text = "Nghỉ";
             // 
-            // textBox3
+            // eldowntime_05
             // 
-            this.textBox3.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.textBox3.BackColor = System.Drawing.Color.Yellow;
-            this.textBox3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox3.Location = new System.Drawing.Point(1218, 8);
-            this.textBox3.Multiline = true;
-            this.textBox3.Name = "textBox3";
-            this.textBox3.ReadOnly = true;
-            this.textBox3.Size = new System.Drawing.Size(35, 30);
-            this.textBox3.TabIndex = 1;
+            this.eldowntime_05.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eldowntime_05.BackColor = System.Drawing.Color.Yellow;
+            this.eldowntime_05.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.eldowntime_05.Location = new System.Drawing.Point(1218, 8);
+            this.eldowntime_05.Multiline = true;
+            this.eldowntime_05.Name = "eldowntime_05";
+            this.eldowntime_05.ReadOnly = true;
+            this.eldowntime_05.Size = new System.Drawing.Size(35, 30);
+            this.eldowntime_05.TabIndex = 1;
             // 
-            // label2
+            // eldowntime_04
             // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
-            this.label2.Location = new System.Drawing.Point(1145, 13);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(49, 20);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Chạy";
+            this.eldowntime_04.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eldowntime_04.AutoSize = true;
+            this.eldowntime_04.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+            this.eldowntime_04.Location = new System.Drawing.Point(1145, 13);
+            this.eldowntime_04.Name = "eldowntime_04";
+            this.eldowntime_04.Size = new System.Drawing.Size(49, 20);
+            this.eldowntime_04.TabIndex = 2;
+            this.eldowntime_04.Text = "Chạy";
             // 
-            // textBox2
+            // eldowntime_03
             // 
-            this.textBox2.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.textBox2.BackColor = System.Drawing.Color.SpringGreen;
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox2.Location = new System.Drawing.Point(1106, 8);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(35, 30);
-            this.textBox2.TabIndex = 1;
+            this.eldowntime_03.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eldowntime_03.BackColor = System.Drawing.Color.SpringGreen;
+            this.eldowntime_03.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.eldowntime_03.Location = new System.Drawing.Point(1106, 8);
+            this.eldowntime_03.Multiline = true;
+            this.eldowntime_03.Name = "eldowntime_03";
+            this.eldowntime_03.ReadOnly = true;
+            this.eldowntime_03.Size = new System.Drawing.Size(35, 30);
+            this.eldowntime_03.TabIndex = 1;
             // 
-            // label1
+            // eldowntime_02
             // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
-            this.label1.Location = new System.Drawing.Point(934, 13);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(146, 20);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Không hoạt động";
+            this.eldowntime_02.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eldowntime_02.AutoSize = true;
+            this.eldowntime_02.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+            this.eldowntime_02.Location = new System.Drawing.Point(934, 13);
+            this.eldowntime_02.Name = "eldowntime_02";
+            this.eldowntime_02.Size = new System.Drawing.Size(146, 20);
+            this.eldowntime_02.TabIndex = 2;
+            this.eldowntime_02.Text = "Không hoạt động";
             // 
-            // textBox1
+            // eldowntime_01
             // 
-            this.textBox1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.textBox1.BackColor = System.Drawing.Color.White;
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.Location = new System.Drawing.Point(895, 8);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(35, 30);
-            this.textBox1.TabIndex = 1;
+            this.eldowntime_01.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.eldowntime_01.BackColor = System.Drawing.Color.White;
+            this.eldowntime_01.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.eldowntime_01.Location = new System.Drawing.Point(895, 8);
+            this.eldowntime_01.Multiline = true;
+            this.eldowntime_01.Name = "eldowntime_01";
+            this.eldowntime_01.ReadOnly = true;
+            this.eldowntime_01.Size = new System.Drawing.Size(35, 30);
+            this.eldowntime_01.TabIndex = 1;
             // 
             // btnSetting
             // 
@@ -528,6 +545,31 @@
             this.btnHide.Text = "Ẩn";
             this.btnHide.Click += new System.EventHandler(this.btnHide_Click);
             // 
+            // elcalltime_02
+            // 
+            this.elcalltime_02.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.elcalltime_02.AutoSize = true;
+            this.elcalltime_02.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+            this.elcalltime_02.Location = new System.Drawing.Point(1201, 13);
+            this.elcalltime_02.Name = "elcalltime_02";
+            this.elcalltime_02.Size = new System.Drawing.Size(217, 20);
+            this.elcalltime_02.TabIndex = 4;
+            this.elcalltime_02.Text = "Số lần gọi nhiều hơn 5 lần";
+            this.elcalltime_02.Visible = false;
+            // 
+            // elcalltime_01
+            // 
+            this.elcalltime_01.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.elcalltime_01.BackColor = System.Drawing.Color.Orange;
+            this.elcalltime_01.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.elcalltime_01.Location = new System.Drawing.Point(1162, 8);
+            this.elcalltime_01.Multiline = true;
+            this.elcalltime_01.Name = "elcalltime_01";
+            this.elcalltime_01.ReadOnly = true;
+            this.elcalltime_01.Size = new System.Drawing.Size(35, 30);
+            this.elcalltime_01.TabIndex = 3;
+            this.elcalltime_01.Visible = false;
+            // 
             // FormMain
             // 
             this.Appearance.BackColor = System.Drawing.Color.White;
@@ -576,14 +618,14 @@
         private DevExpress.XtraGrid.Columns.GridColumn colNo;
         private DevExpress.XtraEditors.PanelControl pnlFooter;
         private DevExpress.XtraEditors.SimpleButton btnSetting;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label eldowntime_02;
+        private System.Windows.Forms.TextBox eldowntime_01;
+        private System.Windows.Forms.Label eldowntime_08;
+        private System.Windows.Forms.TextBox eldowntime_07;
+        private System.Windows.Forms.Label eldowntime_06;
+        private System.Windows.Forms.TextBox eldowntime_05;
+        private System.Windows.Forms.Label eldowntime_04;
+        private System.Windows.Forms.TextBox eldowntime_03;
         private DevExpress.Utils.FlyoutPanel flyoutPanel1;
         private DevExpress.XtraEditors.SimpleButton btnHistory;
         private DevExpress.XtraEditors.SimpleButton btnRunAtStartup;
@@ -595,6 +637,9 @@
         private DevExpress.XtraEditors.SimpleButton btnShift;
         private DevExpress.XtraGrid.Columns.GridColumn colLinecodoCode;
         private DevExpress.XtraEditors.SimpleButton btnRefesh;
+        private System.Windows.Forms.ComboBox cboDisplayDataType;
+        private System.Windows.Forms.Label elcalltime_02;
+        private System.Windows.Forms.TextBox elcalltime_01;
     }
 }
 

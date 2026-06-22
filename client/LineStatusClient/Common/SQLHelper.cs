@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace LineStatusClient.Common
 {
@@ -44,6 +45,38 @@ namespace LineStatusClient.Common
             }
 
             return model;
+        }
+        public static async Task<List<T>> ProcedureToListAsync(
+      string procedureName,
+      string[] paramName,
+      object[] paramValue)
+        {
+            List<T> lst = new List<T>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                using (SqlCommand cmd = new SqlCommand(procedureName, conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    if (paramName != null)
+                    {
+                        for (int i = 0; i < paramName.Length; i++)
+                        {
+                            cmd.Parameters.AddWithValue(paramName[i], paramValue[i] ?? DBNull.Value);
+                        }
+                    }
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        lst = reader.MapToList<T>();
+                    }
+                }
+            }
+
+            return lst;
         }
 
         public static List<T> ProcedureToList(string procedureName, string[] paramName, object[] paramValue)

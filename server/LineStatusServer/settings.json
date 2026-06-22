@@ -1,7 +1,7 @@
 {
-  "ServerName": "172.17.132.28",
+  "ServerName": "127.0.0.1",
   "DatabaseName": "CallASSYDB",
-  "UserName": "user",
-  "Password": "12345678",
+  "UserName": "sa",
+  "Password": "123456",
   "Extra": "TrustServerCertificate=True"
 }

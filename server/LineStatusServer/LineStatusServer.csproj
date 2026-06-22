@@ -256,6 +256,7 @@
     <None Include="Resources\save.png" />
     <None Include="Resources\connect.png" />
     <None Include="Resources\disconnect.png" />
+    <Content Include="Migrations\20260620_SavePositionWhenCallSubleader.sql" />
     <Content Include="wrench.ico" />
     <Content Include="wrench.png" />
   </ItemGroup>

@@ -19,10 +19,10 @@ using System.Windows.Forms;
 
 namespace LineStatusClient.Froms
 {
-    public partial class frmHistory : XtraForm
+    public partial class frmDowntimeHistory : XtraForm
     {
         List<LineShiftDT0_W> list_LineShift = new List<LineShiftDT0_W>();
-        public frmHistory()
+        public frmDowntimeHistory()
         {
             InitializeComponent();
         }

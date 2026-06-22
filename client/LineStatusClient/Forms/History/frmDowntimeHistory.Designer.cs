@@ -1,6 +1,6 @@
 ﻿namespace LineStatusClient.Froms
 {
-    partial class frmHistory
+    partial class frmDowntimeHistory
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmHistory));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDowntimeHistory));
             this.panl_Header = new DevExpress.XtraEditors.PanelControl();
             this.btnExportExcel = new DevExpress.XtraEditors.SimpleButton();
             this.cb_Shift = new DevExpress.XtraEditors.SearchLookUpEdit();

@@ -260,11 +260,33 @@ namespace LineStatusServer
                                 continue;
                             }
 
+                            var now = SQLUtilities.GetDate();
+
+                            // Ghi dữ liệu lịch sử gọi subleader vào DB
+                            if (!string.IsNullOrEmpty(lineData.Sub))
+                            {
+                                _ = Task.Run(() =>
+                                {
+                                    try
+                                    {
+                                        SQLUtilities.ExcuteProcedure(
+                                            "sp_CallSubleaderHistory_Insert",
+                                            new[] { "@LineCode", "@Timestamp", "@Position" },
+                                            new object[] { lineData.LineCode, now, lineData.Sub.Trim() }
+                                        );
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        ErrorLogger.Write($"DB error: (when insert subleader call history) {ex}\nData: {JsonConvert.SerializeObject(lineData)}");
+                                    }
+                                });
+                            }
+
                             var currentKey = (lineData.LineCode, lineData.Status, lineData.ProductCount);
                             if (currentKey.Equals(lastLineKey)) continue;
                             lastLineKey = currentKey;
 
-                            lineData.Timestamp = SQLUtilities.GetDate();
+                            lineData.Timestamp = now;
                             lineData.shift = getShiftBasedOnLineShift(lineData.LineCode, lineData.Timestamp);
 
                             // Cập nhật UI
