@@ -15,6 +15,6 @@ namespace LineStatusClient.DTOs
         public string TotalRunningTime { get; set; }
         public string TotalDowntime { get; set; }
         public DateTime WorkDate { get; set; }
-
+        public string ShiftName { get; set; }
     }
 }

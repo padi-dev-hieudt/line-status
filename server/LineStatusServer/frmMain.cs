@@ -260,7 +260,8 @@ namespace LineStatusServer
                                 continue;
                             }
 
-                            var now = SQLUtilities.GetDate();
+                            lineData.Timestamp = SQLUtilities.GetDate();
+                            lineData.shift = getShiftBasedOnLineShift(lineData.LineCode, lineData.Timestamp);
 
                             // Ghi dữ liệu lịch sử gọi subleader vào DB
                             if (!string.IsNullOrEmpty(lineData.Sub))
@@ -271,8 +272,8 @@ namespace LineStatusServer
                                     {
                                         SQLUtilities.ExcuteProcedure(
                                             "sp_CallSubleaderHistory_Insert",
-                                            new[] { "@LineCode", "@Timestamp", "@Position" },
-                                            new object[] { lineData.LineCode, now, lineData.Sub.Trim() }
+                                            new[] { "@LineCode", "@Timestamp", "@Position", "@WorkShiftId" },
+                                            new object[] { lineData.LineCode, lineData.Timestamp, lineData.Sub.Trim(), lineData.shift }
                                         );
                                     }
                                     catch (Exception ex)
@@ -285,9 +286,6 @@ namespace LineStatusServer
                             var currentKey = (lineData.LineCode, lineData.Status, lineData.ProductCount);
                             if (currentKey.Equals(lastLineKey)) continue;
                             lastLineKey = currentKey;
-
-                            lineData.Timestamp = now;
-                            lineData.shift = getShiftBasedOnLineShift(lineData.LineCode, lineData.Timestamp);
 
                             // Cập nhật UI
                             SafeInvoke(() =>

@@ -1,32 +1,15 @@
-﻿using ClosedXML.Excel;
-using DevExpress.Utils.Extensions;
-using DevExpress.Utils.Text;
-using DevExpress.Utils.Win;
-using DevExpress.XtraBars;
-using DevExpress.XtraBars.Docking2010.Views.WindowsUI;
-using DevExpress.XtraEditors;
-using DevExpress.XtraExport.Helpers;
-using DevExpress.XtraGrid.Columns;
-using DevExpress.XtraGrid.Views.Grid;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
-using DocumentFormat.OpenXml.Office2010.Excel;
+﻿using DevExpress.XtraEditors;
+using DevExpress.XtraSplashScreen;
 using LineStatusClient.Common;
-using LineStatusClient.DTOs;
 using LineStatusClient.Forms;
 using LineStatusClient.Forms.Email;
+using LineStatusClient.Forms.Main;
 using LineStatusClient.Froms;
-using LineStatusClient.Models;
-using Microsoft.Data.SqlClient;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -34,13 +17,12 @@ namespace LineStatusClient
 {
     public partial class FormMain : XtraForm
     {
-        private System.Windows.Forms.Timer timerRunAndDown;
-        private System.Windows.Forms.Timer reconnectTimer;
-        private bool isMonitoringReconnect = false;
-        private SqlDependencyEx dependency; // Khai báo ở class
         private bool isRefresh = false;
-        private readonly object reconnectLock = new object();
+        private bool _switching = false;
         private DisplayDataType _displayDataType = DisplayDataType.Downtime;
+
+        // UC đang hiển thị trong pnlContent (để nút Làm mới yêu cầu nạp lại).
+        private IMainContentControl _activeContent;
 
         private readonly List<Control> _downtimeControl;
         private readonly List<Control> _calltimeControl;
@@ -49,7 +31,6 @@ namespace LineStatusClient
         {
             InitializeComponent();
             InitializeCheckStartUp();
-            InitializeTimer();
 
             _downtimeControl = new List<Control>()
             {
@@ -84,410 +65,100 @@ namespace LineStatusClient
 
         private async void FormMain_Shown(object sender, EventArgs e)
         {
-            await Task.Run(async () =>
-            {
-                try
-                {
-                    grvMain.ShowLoadingPanel();
+            Settings.ReadSQLConnectionString();
+            Settings.LoadConfig();
 
-                    Settings.ReadSQLConnectionString();
-                    Settings.LoadConfig();
-                    await LoadDataAsync();
-                }
-                finally
-                {
-                    grvMain.HideLoadingPanel();
-                }
-               
-                InitializeSqlDependency(); // Không cần tạo Thread thủ công
-            });
-
-           
+            // Mở mặc định màn hình Thời gian dừng.
+            await SwitchContentAsync(DisplayDataType.Downtime);
         }
 
         private async void cboDisplayDataType_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboDisplayDataType.SelectedValue is DisplayDataType selected)
-            {
-                _displayDataType = selected;
-
-                // show hide control theo type 
-                foreach (var item in _downtimeControl)
-                {
-                    item.Visible = selected == DisplayDataType.Downtime;
-                }
-                foreach (var item in _calltimeControl)
-                {
-                    item.Visible = selected == DisplayDataType.CallTime;
-                }
-
-                try
-                {
-                    grvMain.ShowLoadingPanel();
-
-                    // 1. Stop old sql dependency
-                    await Task.Run(() =>
-                    {
-                        StopSqlDependency();
-                    });
-
-                    // 2. Clear data and columns
-                    grdMain.DataSource = null;
-                    grvMain.Columns.Clear();
-                    timerRunAndDown.Stop();
-
-                    // 3. Create columns
-                    switch (selected)
-                    {
-                        case DisplayDataType.Downtime:
-                            timerRunAndDown.Start();
-
-                            CreateDowntimeColumns();
-                            break;
-
-                        case DisplayDataType.CallTime:
-                            CreateCallTimeColumns();
-                            break;
-                    }
-
-                    // 4. Load data
-                    await LoadDataFollowTypeAsync();
-                }
-                finally
-                {
-                    grvMain.HideLoadingPanel();
-                }
-
-                await Task.Run(() =>
-                {
-                    InitializeSqlDependency();
-                });
-            }
+                await SwitchContentAsync(selected);
         }
-        private async Task LoadDataFollowTypeAsync()
+
+        /// <summary>
+        /// Chuyển chế độ hiển thị: hiện overlay loading trên pnlContent, dừng UC cũ
+        /// (phần chặn UI được đẩy ra luồng nền), thay UC mới rồi nạp dữ liệu + theo dõi realtime.
+        /// </summary>
+        private async Task SwitchContentAsync(DisplayDataType selected)
         {
-            switch (_displayDataType)
+            if (_switching) return;
+            _switching = true;
+            _displayDataType = selected;
+            cboDisplayDataType.Enabled = false;
+
+            IOverlaySplashScreenHandle overlay = SplashScreenManager.ShowOverlayForm(pnlContent);
+            try
             {
-                case DisplayDataType.Downtime:
-                    await LoadDataAsync();
-                    break;
-                case DisplayDataType.CallTime:
-                    await LoadData_CallTimeAsync();
-                    break;
+                // 1. Dừng & giải phóng UC cũ (dừng SqlDependencyEx chạy ở luồng nền).
+                if (_activeContent != null)
+                    await _activeContent.DeactivateAsync();
+                ClearContent();
+
+                // 2. Đổi chú thích footer + thêm UC mới.
+                UpdateFooterLegend(selected);
+
+                UserControl uc = (selected == DisplayDataType.CallTime)
+                    ? (UserControl)new uc_main_calltime()
+                    : new uc_main_downtime();
+                uc.Dock = DockStyle.Fill;
+                pnlContent.Controls.Add(uc);
+                _activeContent = (IMainContentControl)uc;
+
+                // 3. Nạp dữ liệu + bắt đầu theo dõi realtime.
+                await _activeContent.ActivateAsync();
+            }
+            finally
+            {
+                SplashScreenManager.CloseOverlayForm(overlay);
+                cboDisplayDataType.Enabled = true;
+                _switching = false;
             }
         }
 
-        private void CreateDowntimeColumns()
+        // Ẩn/hiện chú thích màu ở footer theo loại dữ liệu đang xem.
+        private void UpdateFooterLegend(DisplayDataType selected)
         {
-            var colSTT = grvMain.Columns.AddVisible("No", "STT");
-            HAlignment(colSTT);
-            colSTT.UnboundDataType = typeof(int);
-            // STT: hiển thị giá trị lớn nhất (= tổng số dòng vì STT chạy tuần tự)
-            colSTT.Summary.Add(DevExpress.Data.SummaryItemType.Max, "No", "{0}");
-
-            grvMain.Columns.AddVisible("line_code", "Mã chuyền");
-            grvMain.Columns.AddVisible("line_nm", "Tên chuyền");
-
-            var colTimeRun = grvMain.Columns.AddVisible("TotalRunningTime", "Thời gian chạy");
-            HAlignment(colTimeRun);
-
-            var colTimeStop = grvMain.Columns.AddVisible("TotalDowntime", "Thời gian dừng");
-            HAlignment(colTimeStop);
-
-            var Downtime_col6 = grvMain.Columns.AddVisible("status_text", "Trạng thái");
-            HAlignment(Downtime_col6);
-
-            var Downtime_col7 = grvMain.Columns.AddVisible("product_count", "Số lượng sản phẩm");
-            HAlignment(Downtime_col7);
-            // Số lượng sản phẩm: tính tổng
-            Downtime_col7.Summary.Add(DevExpress.Data.SummaryItemType.Sum, "product_count", "Tổng = {0:0.##}");
-
-            var Downtime_col8 = grvMain.Columns.AddVisible("shift_text", "Ca làm");
-            HAlignment(Downtime_col8);
-
-            // Bật hàng footer để hiển thị summary
-            grvMain.OptionsView.ShowFooter = true;
+            foreach (var item in _downtimeControl)
+            {
+                item.Visible = selected == DisplayDataType.Downtime;
+            }
+            foreach (var item in _calltimeControl)
+            {
+                item.Visible = selected == DisplayDataType.CallTime;
+            }
         }
 
-        private void CreateCallTimeColumns()
+        // Giải phóng UC đang nằm trong pnlContent.
+        private void ClearContent()
         {
-            var colSTT = grvMain.Columns.AddVisible("No", "STT");
-            HAlignment(colSTT);
-            colSTT.UnboundDataType = typeof(int);
-
-            grvMain.Columns.AddVisible("LineCode", "Mã chuyền");
-            grvMain.Columns.AddVisible("LineName", "Tên chuyền");
-            grvMain.Columns.AddVisible("Position", "Vị trí");
-            var colCallCount = grvMain.Columns.AddVisible("CallCount", "Số lần gọi");
-            HAlignment(colCallCount);
-
-            var colCallTime = grvMain.Columns.AddVisible("CallTime", "T/G gọi gần nhất");
-            DisplayAsDateTime(colCallTime);
-        }
-
-        private void DisplayAsDateTime(GridColumn column)
-        {
-            column.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
-            column.DisplayFormat.FormatString = "dd/MM/yyyy HH:mm:ss";
-        }
-
-        private void HAlignment(GridColumn column, DevExpress.Utils.HorzAlignment alignment = DevExpress.Utils.HorzAlignment.Center)
-        {
-            column.AppearanceHeader.TextOptions.HAlignment = alignment;
-            column.AppearanceCell.TextOptions.HAlignment = alignment;
+            foreach (Control ctl in pnlContent.Controls)
+            {
+                ctl.Dispose();
+            }
+            pnlContent.Controls.Clear();
+            _activeContent = null;
         }
 
         private async void btnRefesh_Click(object sender, EventArgs e)
         {
+            if (isRefresh || _switching || _activeContent == null) return;
+            isRefresh = true;
+
+            IOverlaySplashScreenHandle overlay = SplashScreenManager.ShowOverlayForm(pnlContent);
             try
             {
-                grvMain.ShowLoadingPanel();
-
-                if (isRefresh) return;
-                isRefresh = true;
                 await Task.Delay(500);
-                await LoadDataFollowTypeAsync();
-                isRefresh = false;
+                await _activeContent.ReloadAsync();
             }
             finally
             {
-                grvMain.HideLoadingPanel();
+                SplashScreenManager.CloseOverlayForm(overlay);
+                isRefresh = false;
             }
         }
-
-        #region LOAD DATA
-        private async Task LoadDataAsync()
-        {
-            try
-            {
-                var data = await SQLHelper<Line_downtime_history_DTO>.ProcedureToListAsync("spGetLineStatus",
-                      new string[] { },
-                      new object[] { });
-
-                grdMain.BeginInvoke(new Action(() =>
-                {
-                  
-
-                    grdMain.DataSource = data;
-                }));
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.Write(ex);
-            }
-        }
-
-        #region NEW
-        public class LineStatusResult
-        {
-            public long STT { get; set; }
-            public string LineCode { get; set; }
-            public string LineName { get; set; }
-            public string Position { get; set; }
-            public int CallCount { get; set; }
-            public DateTime CallTime { get; set; }
-        }
-        private async Task LoadData_CallTimeAsync()
-        {
-            try
-            {
-                var data = await SQLHelper<LineStatusResult>.ProcedureToListAsync("sp_CallSubleaderHistory_Search",
-                       new string[] { },
-                       new object[] { });
-
-                grdMain.BeginInvoke(new Action(() =>
-                {
-                    grdMain.DataSource = data;
-                }));
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.Write(ex);
-            }
-        }
-        #endregion
-
-        /// <summary>
-        /// Khởi tạo SqlDependencyEx để theo dõi thay đổi dữ liệu
-        /// </summary>
-        private void InitializeSqlDependency()
-        {
-            try
-            {
-                StopSqlDependency(); // Dừng dependency cũ nếu có
-
-                var builder = new SqlConnectionStringBuilder(Settings.connectionString);
-                string dbName = builder.InitialCatalog;
-                int identity = SQLUtilities.GetUniqueIdentity();
-
-                // Check type
-                switch (_displayDataType)
-                {
-                    case DisplayDataType.Downtime:
-                        dependency = new SqlDependencyEx(Settings.connectionString, dbName, "Line_downtime_history", identity: identity);
-                        dependency.TableChanged += async (s, e) => await LoadDataAsync();
-                        break;
-                    case DisplayDataType.CallTime:
-                        dependency = new SqlDependencyEx(Settings.connectionString, dbName, "CallSubleaderHistory", identity: identity);
-                        dependency.TableChanged += async (s, e) => await LoadData_CallTimeAsync();
-                        break;
-                    default:
-                        throw new Exception("Unsupported DisplayDataType for SqlDependencyEx");
-                }
-
-                //dependency = new SqlDependencyEx(Settings.connectionString, dbName, "Line_downtime_history", identity: identity);
-                //dependency.TableChanged += (s, e) => LoadData();
-
-                dependency.NotificationProcessStopped += (s, e) =>
-                {
-                    Invoke((MethodInvoker)StartReconnectMonitor);
-                };
-
-                dependency.Start();
-                Invoke((MethodInvoker)StopReconnectMonitor);
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.SaveLog("Error in InitializeSqlDependency: ", ex.ToString());
-                Invoke((MethodInvoker)StartReconnectMonitor);
-            }
-        }
-
-        /// <summary>
-        /// Dừng SqlDependencyEx nếu đang chạy
-        /// </summary>
-        private void StopSqlDependency()
-        {
-            if (dependency == null) return;
-
-            try { dependency.Stop(); dependency.Dispose(); }
-            catch (Exception ex)
-            {
-            }
-            dependency = null;
-        }
-
-        /// <summary>
-        /// Bắt đầu kiểm tra kết nối SQL định kỳ
-        /// </summary>
-        private void StartReconnectMonitor()
-        {
-            lock (reconnectLock)
-            {
-                if (isMonitoringReconnect) return;
-
-                StopReconnectMonitor();
-
-                reconnectTimer = new System.Windows.Forms.Timer
-                {
-                    Interval = 10000 // 10 seconds
-                };
-                reconnectTimer.Tick += ReconnectTimer_Tick;
-                reconnectTimer.Start();
-
-                isMonitoringReconnect = true;
-            }
-        }
-
-        /// <summary>
-        /// Dừng kiểm tra kết nối SQL
-        /// </summary>
-        private void StopReconnectMonitor()
-        {
-            try
-            {
-                reconnectTimer?.Stop();
-                reconnectTimer?.Dispose();
-            }
-            catch (Exception)
-            {
-            }
-            reconnectTimer = null;
-            isMonitoringReconnect = false;
-        }
-
-        /// <summary>
-        /// Sự kiện kiểm tra kết nối SQL định kỳ
-        /// </summary>
-        private void ReconnectTimer_Tick(object sender, EventArgs e)
-        {
-            if (SQLUtilities.CheckSQLConnection())
-            {
-                InitializeSqlDependency();
-                StopReconnectMonitor();
-            }
-        }
-
-        #endregion
-
-        #region Count running and stopping time
-
-        private void InitializeTimer()
-        {
-            timerRunAndDown = new System.Windows.Forms.Timer();
-            timerRunAndDown.Interval = 1000; // Mỗi giây
-            timerRunAndDown.Tick += Timer_Tick;
-            timerRunAndDown.Start();
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                GridView gridView = grvMain;
-                for (int i = 0; i < gridView.RowCount; i++)
-                {
-                    int status = SQLUtilities.ToInt(gridView.GetRowCellValue(i, "status"));
-
-                    if (status == 1) // Cộng vào TotalRunningTime
-                    {
-                        string time = gridView.GetRowCellValue(i, "TotalRunningTime").ToString();
-                        gridView.SetRowCellValue(i, "TotalRunningTime", AddOneSecond(time));
-                    }
-                    else if (status == 3) // Cộng vào TotalDowntime
-                    {
-                        string time = gridView.GetRowCellValue(i, "TotalDowntime").ToString();
-                        gridView.SetRowCellValue(i, "TotalDowntime", AddOneSecond(time));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.Write(ex);
-            }
-        }
-
-        private string AddOneSecond(string time)
-        {
-            try
-            {
-                string[] parts = time.Split(':');
-                int hours = int.Parse(parts[0]);
-                int minutes = int.Parse(parts[1]);
-                int seconds = int.Parse(parts[2]);
-
-                seconds++;
-                if (seconds >= 60)
-                {
-                    seconds = 0;
-                    minutes++;
-                }
-                if (minutes >= 60)
-                {
-                    minutes = 0;
-                    hours++;
-                }
-
-                return $"{hours:D2}:{minutes:D2}:{seconds:D2}";
-            }
-            catch (Exception ex)
-            {
-                ErrorLogger.Write(ex);
-                return "00:00:00";
-            }
-        }
-
-        #endregion
 
         #region Minimize to tray
         private void btnHide_Click(object sender, EventArgs e)
@@ -592,66 +263,6 @@ namespace LineStatusClient
         #endregion Run on start up
 
         #region OTHERS
-
-        //tự sinh STT
-        private void grvData_CustomUnboundColumnData(object sender, DevExpress.XtraGrid.Views.Base.CustomColumnDataEventArgs e)
-        {
-            if (e.IsGetData)
-            {
-                e.Value = grvMain.GetRowHandle(e.ListSourceRowIndex) + 1;
-            }
-        }
-
-        //Đổ màu row theo status
-        private void grvMain_RowCellStyle(object sender, DevExpress.XtraGrid.Views.Grid.RowCellStyleEventArgs e)
-        {
-            GridView view = sender as GridView;
-            if (e.RowHandle >= 0) // Kiểm tra có phải là hàng hợp lệ không
-            {
-                if(_displayDataType == DisplayDataType.Downtime)
-                {
-                    int status = Convert.ToInt32(view.GetRowCellValue(e.RowHandle, "status"));
-                    switch (status)
-                    {
-                        case 0: // Không chạy
-                            e.Appearance.BackColor = System.Drawing.Color.White;
-                            e.Appearance.ForeColor = System.Drawing.Color.Black;
-                            break;
-                        case 1: // Chạy
-                            e.Appearance.BackColor = System.Drawing.Color.ForestGreen;
-                            e.Appearance.ForeColor = System.Drawing.Color.White;
-                            break;
-                        case 2: // Nghỉ trưa
-                            e.Appearance.BackColor = System.Drawing.Color.Yellow;
-                            e.Appearance.ForeColor = System.Drawing.Color.Black;
-                            break;
-                        case 3:  // Dừng
-                            e.Appearance.BackColor = System.Drawing.Color.OrangeRed;
-                            e.Appearance.ForeColor = System.Drawing.Color.White;
-                            break;
-                        default:
-                            e.Appearance.BackColor = System.Drawing.Color.White;
-                            e.Appearance.ForeColor = System.Drawing.Color.Black;
-                            break;
-                    }
-
-                    return;
-                }
-
-                if (_displayDataType == DisplayDataType.CallTime)
-                {
-                    int callCount = Convert.ToInt32(view.GetRowCellValue(e.RowHandle, "CallCount"));
-                    if(callCount > 5)
-                    {
-                        e.Appearance.BackColor = System.Drawing.Color.Orange;
-                        e.Appearance.ForeColor = System.Drawing.Color.Black;
-                    }
-
-                    return;
-                }
-
-            }
-        }
 
         private void btnSetting_Click(object sender, EventArgs e)
         {
@@ -778,18 +389,5 @@ namespace LineStatusClient
 
         [Description("Thời gian gọi")]
         CallTime
-    }
-
-    public static class EnumExtensions
-    {
-        public static string GetDescription(this Enum value)
-        {
-            var field = value.GetType().GetField(value.ToString());
-
-            return field?
-                .GetCustomAttribute<DescriptionAttribute>()?
-                .Description
-                ?? value.ToString();
-        }
     }
 }

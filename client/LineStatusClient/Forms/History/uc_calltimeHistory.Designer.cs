@@ -41,6 +41,8 @@ namespace LineStatusClient.Forms.History
             this.colLineCode2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colLineName2 = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colPosition = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colShiftName = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.colSumCount = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dtpFrom.Properties)).BeginInit();
@@ -331,7 +333,9 @@ namespace LineStatusClient.Forms.History
             this.colCreatedDate,
             this.colLineCode2,
             this.colLineName2,
-            this.colPosition});
+            this.colPosition,
+            this.colShiftName,
+            this.colSumCount});
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsBehavior.Editable = false;
@@ -413,6 +417,31 @@ namespace LineStatusClient.Forms.History
             this.colPosition.VisibleIndex = 4;
             this.colPosition.Width = 220;
             // 
+            // colShiftName
+            // 
+            this.colShiftName.AppearanceCell.Options.UseTextOptions = true;
+            this.colShiftName.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
+            this.colShiftName.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
+            this.colShiftName.Caption = "Ca làm";
+            this.colShiftName.FieldName = "ShiftName";
+            this.colShiftName.Name = "colShiftName";
+            this.colShiftName.Visible = true;
+            this.colShiftName.VisibleIndex = 5;
+            // 
+            // colSumCount
+            // 
+            this.colSumCount.AppearanceCell.Options.UseTextOptions = true;
+            this.colSumCount.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            this.colSumCount.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
+            this.colSumCount.AppearanceHeader.Options.UseTextOptions = true;
+            this.colSumCount.AppearanceHeader.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
+            this.colSumCount.AppearanceHeader.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
+            this.colSumCount.Caption = "Tổng số lần gọi";
+            this.colSumCount.FieldName = "TotalCount";
+            this.colSumCount.Name = "colSumCount";
+            this.colSumCount.Visible = true;
+            this.colSumCount.VisibleIndex = 6;
+            // 
             // uc_calltimeHistory
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -467,5 +496,7 @@ namespace LineStatusClient.Forms.History
         private DevExpress.XtraGrid.Columns.GridColumn colLineCode2;
         private DevExpress.XtraGrid.Columns.GridColumn colLineName2;
         private DevExpress.XtraGrid.Columns.GridColumn colPosition;
+        private DevExpress.XtraGrid.Columns.GridColumn colShiftName;
+        private DevExpress.XtraGrid.Columns.GridColumn colSumCount;
     }
 }

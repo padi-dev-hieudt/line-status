@@ -9,5 +9,7 @@ namespace LineStatusClient.DTOs
         public string LineName { get; set; }
         public string Position { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string ShiftName { get; set; }
+        public int TotalCount { get; set; }
     }
 }

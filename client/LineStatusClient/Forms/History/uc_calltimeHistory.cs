@@ -22,14 +22,22 @@ namespace LineStatusClient.Forms.History
         public uc_calltimeHistory()
         {
             InitializeComponent();
+
+            gridView1.DataSourceChanged += gridControl1_DataSourceChanged;
         }
 
-        private void uc_calltimeHistory_Load(object sender, EventArgs e)
+        private void gridControl1_DataSourceChanged(object sender, EventArgs e)
+        {
+            gridView1.BestFitColumns();
+        }
+
+        private async void uc_calltimeHistory_Load(object sender, EventArgs e)
         {
             LoadLine();
             btnToday_Click(null, null);
             if (this.FindForm() is Form parentForm)
                 parentForm.AcceptButton = btnSearch;
+            await LoadData();
         }
 
         #region LOAD DATA
@@ -51,7 +59,11 @@ namespace LineStatusClient.Forms.History
 
         private async Task LoadData()
         {
-            if (dtpFrom.EditValue == null || dtpTo.EditValue == null) return;
+            if (dtpFrom.EditValue == null || dtpTo.EditValue == null)
+            {
+                MessageBox.Show("Không để trống Ngày bắt đầu - Ngày kết thúc", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             gridView1.ShowLoadingPanel();
             try
@@ -203,7 +215,7 @@ namespace LineStatusClient.Forms.History
             {
                 Text = "Vui lòng chờ",
                 Size = new Size(300, 110),
-                StartPosition = FormStartPosition.CenterParent,
+                StartPosition = FormStartPosition.CenterScreen,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 ControlBox = false,
                 TopMost = true
@@ -225,8 +237,10 @@ namespace LineStatusClient.Forms.History
                         ws.Cell(1, 3).Value = "Mã chuyền";
                         ws.Cell(1, 4).Value = "Tên chuyền";
                         ws.Cell(1, 5).Value = "Vị trí";
+                        ws.Cell(1, 6).Value = "Ca làm";
+                        ws.Cell(1, 7).Value = "Tổng số lần gọi";
 
-                        var header = ws.Range(1, 1, 1, 5);
+                        var header = ws.Range(1, 1, 1, 7);
                         header.Style.Font.Bold = true;
                         header.Style.Fill.BackgroundColor = XLColor.SteelBlue;
                         header.Style.Font.FontColor = XLColor.White;
@@ -240,6 +254,8 @@ namespace LineStatusClient.Forms.History
                             ws.Cell(row, 3).Value = data[i].LineCode;
                             ws.Cell(row, 4).Value = data[i].LineName;
                             ws.Cell(row, 5).Value = data[i].Position;
+                            ws.Cell(row, 6).Value = data[i].ShiftName;
+                            ws.Cell(row, 7).Value = data[i].TotalCount;
                         }
 
                         ws.Columns().AdjustToContents();
@@ -247,30 +263,36 @@ namespace LineStatusClient.Forms.History
                     }
 
                     this.BeginInvoke(new Action(() =>
-                        MessageBox.Show("Xuất file thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information)));
+                    {
+                        waitForm.Close();
+                        waitForm.Dispose();
+                        btnExport.Enabled = true;
+
+                        var ans = MessageBox.Show("Bạn có muốn mở file đã export không?",
+                            "Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (ans == DialogResult.Yes)
+                            System.Diagnostics.Process.Start(savePath);
+                    }));
                 }
                 catch (Exception ex)
-                {
-                    this.BeginInvoke(new Action(() =>
-                        MessageBox.Show(ex.Message, "Lỗi xuất file", MessageBoxButtons.OK, MessageBoxIcon.Error)));
-                }
-                finally
                 {
                     this.BeginInvoke(new Action(() =>
                     {
                         waitForm.Close();
                         waitForm.Dispose();
                         btnExport.Enabled = true;
+                        MessageBox.Show(ex.Message, "Lỗi xuất file", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }));
                 }
             });
         }
 
-        private void btnReset_Click(object sender, EventArgs e)
+        private async void btnReset_Click(object sender, EventArgs e)
         {
             txtPosition.Text = string.Empty;
             cb_Line.EditValue = null;
             btnToday_Click(null, null);
+            await LoadData();
         }
 
         #endregion

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
+            this.cboDisplayDataType = new System.Windows.Forms.ComboBox();
             this.lbTitle = new DevExpress.XtraEditors.LabelControl();
             this.pnlContent = new DevExpress.XtraEditors.PanelControl();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
@@ -38,12 +39,23 @@
             // 
             // panelControl1
             // 
+            this.panelControl1.Controls.Add(this.cboDisplayDataType);
             this.panelControl1.Controls.Add(this.lbTitle);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.Name = "panelControl1";
             this.panelControl1.Size = new System.Drawing.Size(957, 48);
             this.panelControl1.TabIndex = 0;
+            // 
+            // cboDisplayDataType
+            // 
+            this.cboDisplayDataType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboDisplayDataType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboDisplayDataType.FormattingEnabled = true;
+            this.cboDisplayDataType.Location = new System.Drawing.Point(779, 17);
+            this.cboDisplayDataType.Name = "cboDisplayDataType";
+            this.cboDisplayDataType.Size = new System.Drawing.Size(166, 21);
+            this.cboDisplayDataType.TabIndex = 1;
             // 
             // lbTitle
             // 
@@ -63,7 +75,7 @@
             this.pnlContent.Size = new System.Drawing.Size(957, 523);
             this.pnlContent.TabIndex = 2;
             // 
-            // frmHistory
+            // frmHistoryMaster
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -71,7 +83,7 @@
             this.Controls.Add(this.pnlContent);
             this.Controls.Add(this.panelControl1);
             this.IsMdiContainer = true;
-            this.Name = "frmHistory";
+            this.Name = "frmHistoryMaster";
             this.Text = "frmHistory";
             this.Load += new System.EventHandler(this.frmHistory_Load);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
@@ -87,5 +99,6 @@
         private DevExpress.XtraEditors.PanelControl panelControl1;
         private DevExpress.XtraEditors.LabelControl lbTitle;
         private DevExpress.XtraEditors.PanelControl pnlContent;
+        private System.Windows.Forms.ComboBox cboDisplayDataType;
     }
 }

@@ -34,17 +34,7 @@
             this.cboDisplayDataType = new System.Windows.Forms.ComboBox();
             this.btnRefesh = new DevExpress.XtraEditors.SimpleButton();
             this.label5 = new System.Windows.Forms.Label();
-            this.grdMain = new DevExpress.XtraGrid.GridControl();
-            this.grvMain = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.colNo = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colLinecodoCode = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colLinecodeName = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colTotalRunningTime = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colTotalDowntime = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colStatusText = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colProductcount = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colStatus = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colShift = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.pnlContent = new DevExpress.XtraEditors.PanelControl();
             this.menuNotify = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnitemShow = new System.Windows.Forms.ToolStripMenuItem();
             this.mnitemExit = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,8 +59,7 @@
             this.elcalltime_01 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.grdMain)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.grvMain)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlContent)).BeginInit();
             this.menuNotify.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlFooter)).BeginInit();
             this.pnlFooter.SuspendLayout();
@@ -132,174 +121,18 @@
             this.label5.TabIndex = 0;
             this.label5.Text = "HỆ THÔNG QUẢN LÝ DÂY CHUYỀN (SEB)";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // grdMain
-            // 
-            this.grdMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grdMain.Location = new System.Drawing.Point(0, 60);
-            this.grdMain.MainView = this.grvMain;
-            this.grdMain.Name = "grdMain";
-            this.grdMain.Size = new System.Drawing.Size(1430, 575);
-            this.grdMain.TabIndex = 1;
-            this.grdMain.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.grvMain});
-            // 
-            // grvMain
-            // 
-            this.grvMain.Appearance.HeaderPanel.BackColor = System.Drawing.Color.Transparent;
-            this.grvMain.Appearance.HeaderPanel.Font = new System.Drawing.Font("Tahoma", 20.25F);
-            this.grvMain.Appearance.HeaderPanel.Options.UseBackColor = true;
-            this.grvMain.Appearance.HeaderPanel.Options.UseBorderColor = true;
-            this.grvMain.Appearance.HeaderPanel.Options.UseFont = true;
-            this.grvMain.Appearance.HeaderPanel.Options.UseForeColor = true;
-            this.grvMain.Appearance.HeaderPanel.Options.UseTextOptions = true;
-            this.grvMain.Appearance.HeaderPanel.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.grvMain.Appearance.HeaderPanel.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.grvMain.Appearance.HeaderPanel.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
-            this.grvMain.Appearance.Row.Font = new System.Drawing.Font("Tahoma", 20.25F);
-            this.grvMain.Appearance.Row.Options.UseFont = true;
-            this.grvMain.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
-            this.colNo,
-            this.colLinecodoCode,
-            this.colLinecodeName,
-            this.colTotalRunningTime,
-            this.colTotalDowntime,
-            this.colStatusText,
-            this.colProductcount,
-            this.colStatus,
-            this.colShift});
-            this.grvMain.GridControl = this.grdMain;
-            this.grvMain.Name = "grvMain";
-            this.grvMain.OptionsBehavior.Editable = false;
-            this.grvMain.OptionsFilter.AllowFilterEditor = false;
-            this.grvMain.OptionsView.ShowFooter = true;
-            this.grvMain.OptionsView.ShowGroupPanel = false;
-            this.grvMain.OptionsView.ShowIndicator = false;
-            this.grvMain.RowCellStyle += new DevExpress.XtraGrid.Views.Grid.RowCellStyleEventHandler(this.grvMain_RowCellStyle);
-            this.grvMain.CustomUnboundColumnData += new DevExpress.XtraGrid.Views.Base.CustomColumnDataEventHandler(this.grvData_CustomUnboundColumnData);
-            // 
-            // colNo
-            // 
-            this.colNo.AppearanceCell.Options.UseTextOptions = true;
-            this.colNo.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.colNo.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.colNo.Caption = "STT";
-            this.colNo.DisplayFormat.FormatString = "n0";
-            this.colNo.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.colNo.FieldName = "No";
-            this.colNo.MaxWidth = 60;
-            this.colNo.MinWidth = 60;
-            this.colNo.Name = "colNo";
-            this.colNo.OptionsColumn.AllowEdit = false;
-            this.colNo.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
-            this.colNo.Summary.AddRange(new DevExpress.XtraGrid.GridSummaryItem[] {
-            new DevExpress.XtraGrid.GridColumnSummaryItem(DevExpress.Data.SummaryItemType.Count, "No", "{0}")});
-            this.colNo.UnboundDataType = typeof(int);
-            this.colNo.Visible = true;
-            this.colNo.VisibleIndex = 0;
-            this.colNo.Width = 60;
-            // 
-            // colLinecodoCode
-            // 
-            this.colLinecodoCode.AppearanceCell.Options.UseTextOptions = true;
-            this.colLinecodoCode.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.colLinecodoCode.AppearanceCell.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
-            this.colLinecodoCode.Caption = "Mã chuyền";
-            this.colLinecodoCode.FieldName = "line_code";
-            this.colLinecodoCode.Name = "colLinecodoCode";
-            this.colLinecodoCode.Visible = true;
-            this.colLinecodoCode.VisibleIndex = 1;
-            this.colLinecodoCode.Width = 157;
-            // 
-            // colLinecodeName
-            // 
-            this.colLinecodeName.AppearanceCell.Options.UseTextOptions = true;
-            this.colLinecodeName.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.colLinecodeName.Caption = "Tên chuyền";
-            this.colLinecodeName.FieldName = "line_nm";
-            this.colLinecodeName.Name = "colLinecodeName";
-            this.colLinecodeName.OptionsColumn.ReadOnly = true;
-            this.colLinecodeName.Visible = true;
-            this.colLinecodeName.VisibleIndex = 2;
-            this.colLinecodeName.Width = 299;
-            // 
-            // colTotalRunningTime
-            // 
-            this.colTotalRunningTime.AppearanceCell.Options.UseTextOptions = true;
-            this.colTotalRunningTime.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.colTotalRunningTime.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.colTotalRunningTime.Caption = "Thời gian chạy";
-            this.colTotalRunningTime.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Custom;
-            this.colTotalRunningTime.FieldName = "TotalRunningTime";
-            this.colTotalRunningTime.Name = "colTotalRunningTime";
-            this.colTotalRunningTime.OptionsColumn.ReadOnly = true;
-            this.colTotalRunningTime.Visible = true;
-            this.colTotalRunningTime.VisibleIndex = 3;
-            this.colTotalRunningTime.Width = 217;
-            // 
-            // colTotalDowntime
-            // 
-            this.colTotalDowntime.AppearanceCell.Options.UseTextOptions = true;
-            this.colTotalDowntime.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.colTotalDowntime.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.colTotalDowntime.Caption = "Thời gian dừng";
-            this.colTotalDowntime.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Custom;
-            this.colTotalDowntime.FieldName = "TotalDowntime";
-            this.colTotalDowntime.Name = "colTotalDowntime";
-            this.colTotalDowntime.OptionsColumn.AllowEdit = false;
-            this.colTotalDowntime.Visible = true;
-            this.colTotalDowntime.VisibleIndex = 4;
-            this.colTotalDowntime.Width = 217;
-            // 
-            // colStatusText
-            // 
-            this.colStatusText.AppearanceCell.Options.UseTextOptions = true;
-            this.colStatusText.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.colStatusText.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.colStatusText.Caption = "Trạng thái";
-            this.colStatusText.FieldName = "status_text";
-            this.colStatusText.Name = "colStatusText";
-            this.colStatusText.OptionsColumn.ReadOnly = true;
-            this.colStatusText.Visible = true;
-            this.colStatusText.VisibleIndex = 5;
-            this.colStatusText.Width = 244;
-            // 
-            // colProductcount
-            // 
-            this.colProductcount.AppearanceCell.Options.UseTextOptions = true;
-            this.colProductcount.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.colProductcount.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.colProductcount.Caption = "Số lượng sản phẩm";
-            this.colProductcount.FieldName = "product_count";
-            this.colProductcount.Name = "colProductcount";
-            this.colProductcount.OptionsColumn.ReadOnly = true;
-            this.colProductcount.Summary.AddRange(new DevExpress.XtraGrid.GridSummaryItem[] {
-            new DevExpress.XtraGrid.GridColumnSummaryItem(DevExpress.Data.SummaryItemType.Sum, "product_count", "Tổng = {0:0.##}")});
-            this.colProductcount.Visible = true;
-            this.colProductcount.VisibleIndex = 6;
-            this.colProductcount.Width = 256;
-            // 
-            // colStatus
-            // 
-            this.colStatus.Caption = "Status";
-            this.colStatus.FieldName = "status_text";
-            this.colStatus.Name = "colStatus";
-            // 
-            // colShift
-            // 
-            this.colShift.AppearanceCell.Options.UseTextOptions = true;
-            this.colShift.AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
-            this.colShift.AppearanceCell.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.colShift.Caption = "Ca làm";
-            this.colShift.FieldName = "shift_text";
-            this.colShift.Name = "colShift";
-            this.colShift.OptionsColumn.AllowEdit = false;
-            this.colShift.Visible = true;
-            this.colShift.VisibleIndex = 7;
-            this.colShift.Width = 165;
-            // 
+            //
+            // pnlContent
+            //
+            this.pnlContent.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.pnlContent.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlContent.Location = new System.Drawing.Point(0, 60);
+            this.pnlContent.Name = "pnlContent";
+            this.pnlContent.Size = new System.Drawing.Size(1430, 575);
+            this.pnlContent.TabIndex = 1;
+            //
             // menuNotify
-            // 
+            //
             this.menuNotify.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnitemShow,
             this.mnitemExit});
@@ -578,7 +411,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1430, 680);
             this.Controls.Add(this.flyoutPanel1);
-            this.Controls.Add(this.grdMain);
+            this.Controls.Add(this.pnlContent);
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.pnlFooter);
             this.IconOptions.Image = global::LineStatusClient.Properties.Resources.line;
@@ -589,8 +422,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).EndInit();
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.grdMain)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.grvMain)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlContent)).EndInit();
             this.menuNotify.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pnlFooter)).EndInit();
             this.pnlFooter.ResumeLayout(false);
@@ -604,18 +436,11 @@
         #endregion
 
         private DevExpress.XtraEditors.PanelControl pnlHeader;
-        private DevExpress.XtraGrid.GridControl grdMain;
-        private DevExpress.XtraGrid.Views.Grid.GridView grvMain;
+        private DevExpress.XtraEditors.PanelControl pnlContent;
         private System.Windows.Forms.ContextMenuStrip menuNotify;
         private System.Windows.Forms.ToolStripMenuItem mnitemShow;
         private System.Windows.Forms.ToolStripMenuItem mnitemExit;
         private System.Windows.Forms.NotifyIcon notifyIcon;
-        private DevExpress.XtraGrid.Columns.GridColumn colLinecodeName;
-        private DevExpress.XtraGrid.Columns.GridColumn colTotalRunningTime;
-        private DevExpress.XtraGrid.Columns.GridColumn colStatusText;
-        private DevExpress.XtraGrid.Columns.GridColumn colProductcount;
-        private DevExpress.XtraGrid.Columns.GridColumn colStatus;
-        private DevExpress.XtraGrid.Columns.GridColumn colNo;
         private DevExpress.XtraEditors.PanelControl pnlFooter;
         private DevExpress.XtraEditors.SimpleButton btnSetting;
         private System.Windows.Forms.Label eldowntime_02;
@@ -631,11 +456,8 @@
         private DevExpress.XtraEditors.SimpleButton btnRunAtStartup;
         private DevExpress.XtraEditors.SimpleButton btnHide;
         private System.Windows.Forms.Label label5;
-        private DevExpress.XtraGrid.Columns.GridColumn colTotalDowntime;
-        private DevExpress.XtraGrid.Columns.GridColumn colShift;
         private DevExpress.XtraEditors.SimpleButton btnEmail;
         private DevExpress.XtraEditors.SimpleButton btnShift;
-        private DevExpress.XtraGrid.Columns.GridColumn colLinecodoCode;
         private DevExpress.XtraEditors.SimpleButton btnRefesh;
         private System.Windows.Forms.ComboBox cboDisplayDataType;
         private System.Windows.Forms.Label elcalltime_02;
