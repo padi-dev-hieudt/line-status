@@ -3,6 +3,9 @@ using DevExpress.XtraEditors;
 using LineStatusClient.Common;
 using LineStatusClient.DTOs;
 using LineStatusClient.Models;
+using OfficeOpenXml;
+using OfficeOpenXml.Drawing.Chart;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -211,17 +214,7 @@ namespace LineStatusClient.Forms.History
             var data = _currentData.ToList();
 
             btnExport.Enabled = false;
-            var waitForm = new Form
-            {
-                Text = "Vui lòng chờ",
-                Size = new Size(300, 110),
-                StartPosition = FormStartPosition.CenterScreen,
-                FormBorderStyle = FormBorderStyle.FixedDialog,
-                ControlBox = false,
-                TopMost = true
-            };
-            waitForm.Controls.Add(new Label { Text = "Đang xuất dữ liệu...", Dock = DockStyle.Top, Height = 45, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Microsoft Sans Serif", 11F) });
-            waitForm.Controls.Add(new System.Windows.Forms.ProgressBar { Style = ProgressBarStyle.Marquee, Dock = DockStyle.Bottom, Height = 28, MarqueeAnimationSpeed = 30 });
+            var waitForm = CreateWaitForm();
             waitForm.Show(this);
 
             Task.Run(() =>
@@ -285,6 +278,255 @@ namespace LineStatusClient.Forms.History
                     }));
                 }
             });
+        }
+
+        private Form CreateWaitForm()
+        {
+            var waitForm = new Form
+            {
+                Text = "Vui lòng chờ",
+                Size = new Size(300, 110),
+                StartPosition = FormStartPosition.CenterScreen,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                ControlBox = false,
+                TopMost = true
+            };
+            waitForm.Controls.Add(new Label { Text = "Đang xuất dữ liệu...", Dock = DockStyle.Top, Height = 45, TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Microsoft Sans Serif", 11F) });
+            waitForm.Controls.Add(new System.Windows.Forms.ProgressBar { Style = ProgressBarStyle.Marquee, Dock = DockStyle.Bottom, Height = 28, MarqueeAnimationSpeed = 30 });
+            return waitForm;
+        }
+
+        private DateTime? ShowMonthPickerDialog()
+        {
+            using (var dlg = new XtraForm())
+            {
+                dlg.Text = "Chọn tháng";
+                dlg.Size = new Size(300, 150);
+                dlg.StartPosition = FormStartPosition.CenterParent;
+                dlg.FormBorderStyle = FormBorderStyle.FixedDialog;
+                dlg.MaximizeBox = false;
+                dlg.MinimizeBox = false;
+
+                var lbl = new LabelControl { Text = "Tháng xuất dữ liệu:", Location = new Point(15, 18), AutoSizeMode = LabelAutoSizeMode.None, Size = new Size(120, 22) };
+                lbl.Appearance.Font = new Font("Microsoft Sans Serif", 10F);
+                lbl.Appearance.Options.UseFont = true;
+
+                var dtpMonth = new DateEdit { Location = new Point(140, 16), Size = new Size(125, 22) };
+                dtpMonth.Properties.Appearance.Font = new Font("Microsoft Sans Serif", 10F);
+                dtpMonth.Properties.Appearance.Options.UseFont = true;
+                dtpMonth.Properties.CalendarView = DevExpress.XtraEditors.Controls.CalendarView.Vista;
+                dtpMonth.Properties.VistaCalendarInitialViewStyle = VistaCalendarInitialViewStyle.YearView;
+                dtpMonth.Properties.VistaCalendarViewStyle = VistaCalendarViewStyle.YearView;
+                dtpMonth.Properties.DisplayFormat.FormatString = "MM/yyyy";
+                dtpMonth.Properties.DisplayFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                dtpMonth.Properties.EditFormat.FormatString = "MM/yyyy";
+                dtpMonth.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.DateTime;
+                dtpMonth.Properties.MaskSettings.Set("mask", "MM/yyyy");
+                dtpMonth.Properties.UseMaskAsDisplayFormat = true;
+                dtpMonth.EditValue = DateTime.Today;
+
+                var btnOk = new SimpleButton { Text = "Xuất Excel", Location = new Point(60, 60), Size = new Size(100, 26), DialogResult = DialogResult.OK };
+                btnOk.Appearance.BackColor = Color.SteelBlue;
+                btnOk.Appearance.ForeColor = Color.White;
+                btnOk.Appearance.Options.UseBackColor = true;
+                btnOk.Appearance.Options.UseForeColor = true;
+                var btnCancel = new SimpleButton { Text = "Hủy", Location = new Point(170, 60), Size = new Size(80, 26), DialogResult = DialogResult.Cancel };
+
+                dlg.Controls.AddRange(new Control[] { lbl, dtpMonth, btnOk, btnCancel });
+                dlg.AcceptButton = btnOk;
+                dlg.CancelButton = btnCancel;
+
+                if (dlg.ShowDialog(this) != DialogResult.OK || dtpMonth.EditValue == null)
+                    return null;
+                return Convert.ToDateTime(dtpMonth.EditValue);
+            }
+        }
+
+        private async void btnExportMonth_Click(object sender, EventArgs e)
+        {
+            DateTime? selected = ShowMonthPickerDialog();
+            if (selected == null) return;
+
+            int year = selected.Value.Year;
+            int month = selected.Value.Month;
+
+            List<CallSubleaderHistoryDTO> data;
+            try
+            {
+                data = await SQLHelper<CallSubleaderHistoryDTO>.ProcedureToListAsync(
+                    "sp_CallSubleaderHistory_ExportByMonth",
+                    new[] { "@Year", "@Month" },
+                    new object[] { year, month });
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger.SaveLog("btnExportMonth_Click", ex.Message);
+                MessageBox.Show(ex.Message, "Lỗi tải dữ liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (data == null || data.Count == 0)
+            {
+                MessageBox.Show($"Không có dữ liệu tháng {month:00}/{year} để xuất!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string savePath = OpenSaveFileDialog($"LichSuGoi_Thang{month:00}_{year}");
+            if (string.IsNullOrEmpty(savePath)) return;
+
+            btnExportMonth.Enabled = false;
+            var waitForm = CreateWaitForm();
+            waitForm.Show(this);
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    ExportMonthlyReport(data, year, month, savePath);
+
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        waitForm.Close();
+                        waitForm.Dispose();
+                        btnExportMonth.Enabled = true;
+
+                        var ans = MessageBox.Show("Bạn có muốn mở file đã export không?",
+                            "Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (ans == DialogResult.Yes)
+                            System.Diagnostics.Process.Start(savePath);
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        waitForm.Close();
+                        waitForm.Dispose();
+                        btnExportMonth.Enabled = true;
+                        MessageBox.Show(ex.Message, "Lỗi xuất file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }));
+                }
+            });
+        }
+
+        private static void ExportMonthlyReport(List<CallSubleaderHistoryDTO> data, int year, int month, string savePath)
+        {
+            var monthSummary = data
+                .GroupBy(x => x.Position)
+                .Select(g => new { Position = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count).ThenBy(x => x.Position)
+                .ToList();
+
+            var days = data.Select(x => x.CreatedDate.Date).Distinct().OrderBy(d => d).ToList();
+            var dayCounts = data
+                .GroupBy(x => new { x.Position, Day = x.CreatedDate.Date })
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            using (var pkg = new ExcelPackage())
+            {
+                var ws = pkg.Workbook.Worksheets.Add($"Báo cáo tháng {month:00}-{year}");
+
+                // ===== Bảng chi tiết (cột A-G) =====
+                ws.Cells[1, 1].Value = "STT";
+                ws.Cells[1, 2].Value = "Thời gian";
+                ws.Cells[1, 3].Value = "Mã chuyền";
+                ws.Cells[1, 4].Value = "Tên chuyền";
+                ws.Cells[1, 5].Value = "Vị trí";
+                ws.Cells[1, 6].Value = "Ca làm";
+                ws.Cells[1, 7].Value = "Tổng số lần gọi";
+                StyleHeader(ws.Cells[1, 1, 1, 7]);
+
+                for (int i = 0; i < data.Count; i++)
+                {
+                    int row = i + 2;
+                    ws.Cells[row, 1].Value = i + 1;
+                    ws.Cells[row, 2].Value = data[i].CreatedDate.ToString("dd/MM/yyyy HH:mm:ss");
+                    ws.Cells[row, 3].Value = data[i].LineCode;
+                    ws.Cells[row, 4].Value = data[i].LineName;
+                    ws.Cells[row, 5].Value = data[i].Position;
+                    ws.Cells[row, 6].Value = data[i].ShiftName;
+                    ws.Cells[row, 7].Value = data[i].TotalCount;
+                }
+
+                // ===== Bảng tổng hợp theo tháng (cột I-J) + biểu đồ =====
+                const int sumCol = 9;
+                ws.Cells[1, sumCol].Value = "VỊ TRÍ GỌI NHIỀU TRONG THÁNG";
+                ws.Cells[1, sumCol, 1, sumCol + 2].Merge = true;
+                ws.Cells[1, sumCol].Style.Font.Bold = true;
+
+                ws.Cells[2, sumCol].Value = "Vị trí";
+                ws.Cells[2, sumCol + 1].Value = "Số lần gọi";
+                StyleHeader(ws.Cells[2, sumCol, 2, sumCol + 1]);
+
+                for (int i = 0; i < monthSummary.Count; i++)
+                {
+                    ws.Cells[3 + i, sumCol].Value = monthSummary[i].Position;
+                    ws.Cells[3 + i, sumCol + 1].Value = monthSummary[i].Count;
+                }
+                int sumLastRow = 2 + monthSummary.Count;
+
+                var chartMonth = ws.Drawings.AddChart("chartMonth", eChartType.ColumnClustered);
+                chartMonth.Title.Text = "Vị trí gọi nhiều trong tháng";
+                chartMonth.SetPosition(1, 0, sumCol + 2, 0);
+                chartMonth.SetSize(480, 300);
+                var monthSerie = chartMonth.Series.Add(
+                    ws.Cells[3, sumCol + 1, sumLastRow, sumCol + 1],
+                    ws.Cells[3, sumCol, sumLastRow, sumCol]);
+                monthSerie.Header = "Số lần gọi";
+                chartMonth.Legend.Remove();
+
+                // ===== Bảng theo ngày (pivot: vị trí x ngày) + biểu đồ =====
+                int pivotTitleRow = Math.Max(sumLastRow, 16) + 3;
+                int pivotHeaderRow = pivotTitleRow + 1;
+                int firstDayCol = sumCol + 1;
+                int lastDayCol = sumCol + days.Count;
+
+                ws.Cells[pivotTitleRow, sumCol].Value = "VỊ TRÍ GỌI NHIỀU TRONG NGÀY";
+                ws.Cells[pivotTitleRow, sumCol, pivotTitleRow, lastDayCol].Merge = true;
+                ws.Cells[pivotTitleRow, sumCol].Style.Font.Bold = true;
+
+                ws.Cells[pivotHeaderRow, sumCol].Value = "Vị trí";
+                for (int d = 0; d < days.Count; d++)
+                    ws.Cells[pivotHeaderRow, firstDayCol + d].Value = days[d].ToString("dd/MM");
+                StyleHeader(ws.Cells[pivotHeaderRow, sumCol, pivotHeaderRow, lastDayCol]);
+
+                for (int i = 0; i < monthSummary.Count; i++)
+                {
+                    int row = pivotHeaderRow + 1 + i;
+                    string pos = monthSummary[i].Position;
+                    ws.Cells[row, sumCol].Value = pos;
+                    for (int d = 0; d < days.Count; d++)
+                    {
+                        int count;
+                        if (dayCounts.TryGetValue(new { Position = pos, Day = days[d] }, out count))
+                            ws.Cells[row, firstDayCol + d].Value = count;
+                    }
+                }
+
+                var chartDay = ws.Drawings.AddChart("chartDay", eChartType.ColumnClustered);
+                chartDay.Title.Text = "Vị trí gọi nhiều trong ngày";
+                chartDay.SetPosition(pivotTitleRow, 0, lastDayCol + 1, 0);
+                chartDay.SetSize(720, 340);
+                var xRange = ws.Cells[pivotHeaderRow, firstDayCol, pivotHeaderRow, lastDayCol];
+                for (int i = 0; i < monthSummary.Count; i++)
+                {
+                    int row = pivotHeaderRow + 1 + i;
+                    var serie = chartDay.Series.Add(ws.Cells[row, firstDayCol, row, lastDayCol], xRange);
+                    serie.Header = monthSummary[i].Position;
+                }
+
+                ws.Cells[1, 1, Math.Max(data.Count + 1, pivotHeaderRow + monthSummary.Count), lastDayCol].AutoFitColumns();
+                pkg.SaveAs(new FileInfo(savePath));
+            }
+        }
+
+        private static void StyleHeader(ExcelRange range)
+        {
+            range.Style.Font.Bold = true;
+            range.Style.Font.Color.SetColor(Color.White);
+            range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            range.Style.Fill.BackgroundColor.SetColor(Color.SteelBlue);
+            range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
 
         private async void btnReset_Click(object sender, EventArgs e)

@@ -31,6 +31,7 @@ namespace LineStatusClient.Forms.History
             this.lblPosition = new DevExpress.XtraEditors.LabelControl();
             this.txtPosition = new DevExpress.XtraEditors.TextEdit();
             this.btnExport = new DevExpress.XtraEditors.SimpleButton();
+            this.btnExportMonth = new DevExpress.XtraEditors.SimpleButton();
             this.btnReset = new DevExpress.XtraEditors.SimpleButton();
             this.btnSearch = new DevExpress.XtraEditors.SimpleButton();
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
@@ -72,6 +73,7 @@ namespace LineStatusClient.Forms.History
             this.groupControl1.Controls.Add(this.lblPosition);
             this.groupControl1.Controls.Add(this.txtPosition);
             this.groupControl1.Controls.Add(this.btnExport);
+            this.groupControl1.Controls.Add(this.btnExportMonth);
             this.groupControl1.Controls.Add(this.btnReset);
             this.groupControl1.Controls.Add(this.btnSearch);
             this.groupControl1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -243,7 +245,7 @@ namespace LineStatusClient.Forms.History
             this.lblPosition.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far;
             this.lblPosition.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
             this.lblPosition.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
-            this.lblPosition.Location = new System.Drawing.Point(776, 28);
+            this.lblPosition.Location = new System.Drawing.Point(726, 28);
             this.lblPosition.Name = "lblPosition";
             this.lblPosition.Size = new System.Drawing.Size(40, 24);
             this.lblPosition.TabIndex = 10;
@@ -251,11 +253,11 @@ namespace LineStatusClient.Forms.History
             // 
             // txtPosition
             // 
-            this.txtPosition.Location = new System.Drawing.Point(820, 28);
+            this.txtPosition.Location = new System.Drawing.Point(770, 28);
             this.txtPosition.Name = "txtPosition";
             this.txtPosition.Properties.Appearance.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.txtPosition.Properties.Appearance.Options.UseFont = true;
-            this.txtPosition.Size = new System.Drawing.Size(90, 22);
+            this.txtPosition.Size = new System.Drawing.Size(84, 22);
             this.txtPosition.TabIndex = 11;
             // 
             // btnExport
@@ -269,7 +271,19 @@ namespace LineStatusClient.Forms.History
             this.btnExport.TabIndex = 14;
             this.btnExport.Text = "Xuất Excel";
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
-            // 
+            //
+            // btnExportMonth
+            //
+            this.btnExportMonth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExportMonth.Appearance.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.btnExportMonth.Appearance.Options.UseFont = true;
+            this.btnExportMonth.Location = new System.Drawing.Point(858, 28);
+            this.btnExportMonth.Name = "btnExportMonth";
+            this.btnExportMonth.Size = new System.Drawing.Size(109, 24);
+            this.btnExportMonth.TabIndex = 15;
+            this.btnExportMonth.Text = "Xuất theo tháng";
+            this.btnExportMonth.Click += new System.EventHandler(this.btnExportMonth_Click);
+            //
             // btnReset
             // 
             this.btnReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -488,6 +502,7 @@ namespace LineStatusClient.Forms.History
         private DevExpress.XtraEditors.SimpleButton btnSearch;
         private DevExpress.XtraEditors.SimpleButton btnReset;
         private DevExpress.XtraEditors.SimpleButton btnExport;
+        private DevExpress.XtraEditors.SimpleButton btnExportMonth;
         private DevExpress.XtraEditors.GroupControl groupControl2;
         private DevExpress.XtraGrid.GridControl gridControl1;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
