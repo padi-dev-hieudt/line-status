@@ -470,6 +470,7 @@ namespace LineStatusClient.Forms.History
                 chartMonth.SetPosition(1, 0, sumCol + 2, 0);
                 chartMonth.SetSize(760, 420);
                 chartMonth.GapWidth = 10;
+                chartMonth.DataLabel.ShowValue = true;
                 var monthSerie = chartMonth.Series.Add(
                     ws.Cells[3, sumCol + 1, sumLastRow, sumCol + 1],
                     ws.Cells[3, sumCol, sumLastRow, sumCol]);
@@ -509,6 +510,7 @@ namespace LineStatusClient.Forms.History
                 chartDay.SetPosition(pivotTitleRow, 0, lastDayCol + 1, 0);
                 chartDay.SetSize(1200, 520);
                 chartDay.GapWidth = 10;
+                chartDay.DataLabel.ShowValue = true;
                 var xRange = ws.Cells[pivotHeaderRow, firstDayCol, pivotHeaderRow, lastDayCol];
                 for (int i = 0; i < monthSummary.Count; i++)
                 {
