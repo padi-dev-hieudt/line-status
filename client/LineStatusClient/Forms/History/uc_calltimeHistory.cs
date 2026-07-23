@@ -468,7 +468,7 @@ namespace LineStatusClient.Forms.History
                 var chartMonth = (ExcelBarChart)ws.Drawings.AddChart("chartMonth", eChartType.ColumnClustered);
                 chartMonth.Title.Text = "Vị trí gọi nhiều trong tháng";
                 chartMonth.SetPosition(1, 0, sumCol + 2, 0);
-                chartMonth.SetSize(760, 420);
+                chartMonth.SetSize(Math.Max(600, monthSummary.Count * 22), 420);
                 chartMonth.GapWidth = 10;
                 chartMonth.DataLabel.ShowValue = true;
                 var monthSerie = chartMonth.Series.Add(
