@@ -314,7 +314,7 @@ namespace LineStatusClient.Forms.History
                 var dtpMonth = new DateEdit { Location = new Point(140, 16), Size = new Size(125, 22) };
                 dtpMonth.Properties.Appearance.Font = new Font("Microsoft Sans Serif", 10F);
                 dtpMonth.Properties.Appearance.Options.UseFont = true;
-                dtpMonth.Properties.CalendarView = DevExpress.XtraEditors.Controls.CalendarView.Vista;
+                dtpMonth.Properties.CalendarView = DevExpress.XtraEditors.Repository.CalendarView.Vista;
                 dtpMonth.Properties.VistaCalendarInitialViewStyle = VistaCalendarInitialViewStyle.YearView;
                 dtpMonth.Properties.VistaCalendarViewStyle = VistaCalendarViewStyle.YearView;
                 dtpMonth.Properties.DisplayFormat.FormatString = "MM/yyyy";
@@ -465,10 +465,11 @@ namespace LineStatusClient.Forms.History
                 }
                 int sumLastRow = 2 + monthSummary.Count;
 
-                var chartMonth = ws.Drawings.AddChart("chartMonth", eChartType.ColumnClustered);
+                var chartMonth = (ExcelBarChart)ws.Drawings.AddChart("chartMonth", eChartType.ColumnClustered);
                 chartMonth.Title.Text = "Vị trí gọi nhiều trong tháng";
                 chartMonth.SetPosition(1, 0, sumCol + 2, 0);
-                chartMonth.SetSize(480, 300);
+                chartMonth.SetSize(760, 420);
+                chartMonth.GapWidth = 40;
                 var monthSerie = chartMonth.Series.Add(
                     ws.Cells[3, sumCol + 1, sumLastRow, sumCol + 1],
                     ws.Cells[3, sumCol, sumLastRow, sumCol]);
@@ -476,7 +477,7 @@ namespace LineStatusClient.Forms.History
                 chartMonth.Legend.Remove();
 
                 // ===== Bảng theo ngày (pivot: vị trí x ngày) + biểu đồ =====
-                int pivotTitleRow = Math.Max(sumLastRow, 16) + 3;
+                int pivotTitleRow = Math.Max(sumLastRow, 24) + 3;
                 int pivotHeaderRow = pivotTitleRow + 1;
                 int firstDayCol = sumCol + 1;
                 int lastDayCol = sumCol + days.Count;
@@ -503,10 +504,11 @@ namespace LineStatusClient.Forms.History
                     }
                 }
 
-                var chartDay = ws.Drawings.AddChart("chartDay", eChartType.ColumnClustered);
+                var chartDay = (ExcelBarChart)ws.Drawings.AddChart("chartDay", eChartType.ColumnClustered);
                 chartDay.Title.Text = "Vị trí gọi nhiều trong ngày";
                 chartDay.SetPosition(pivotTitleRow, 0, lastDayCol + 1, 0);
-                chartDay.SetSize(720, 340);
+                chartDay.SetSize(1200, 520);
+                chartDay.GapWidth = 40;
                 var xRange = ws.Cells[pivotHeaderRow, firstDayCol, pivotHeaderRow, lastDayCol];
                 for (int i = 0; i < monthSummary.Count; i++)
                 {
