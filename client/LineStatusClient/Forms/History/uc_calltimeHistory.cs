@@ -500,15 +500,15 @@ namespace LineStatusClient.Forms.History
                     for (int d = 0; d < days.Count; d++)
                     {
                         int count;
-                        if (dayCounts.TryGetValue(new { Position = pos, Day = days[d] }, out count))
-                            ws.Cells[row, firstDayCol + d].Value = count;
+                        dayCounts.TryGetValue(new { Position = pos, Day = days[d] }, out count);
+                        ws.Cells[row, firstDayCol + d].Value = count;
                     }
                 }
 
-                var chartDay = (ExcelBarChart)ws.Drawings.AddChart("chartDay", eChartType.ColumnClustered);
+                var chartDay = (ExcelBarChart)ws.Drawings.AddChart("chartDay", eChartType.ColumnStacked);
                 chartDay.Title.Text = "Vị trí gọi nhiều trong ngày";
                 chartDay.SetPosition(pivotTitleRow, 0, lastDayCol + 1, 0);
-                chartDay.SetSize(1200, 520);
+                chartDay.SetSize(Math.Max(600, days.Count * 30), 420);
                 chartDay.GapWidth = 10;
                 chartDay.DataLabel.ShowValue = true;
                 var xRange = ws.Cells[pivotHeaderRow, firstDayCol, pivotHeaderRow, lastDayCol];
