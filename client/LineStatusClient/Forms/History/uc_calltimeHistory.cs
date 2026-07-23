@@ -505,12 +505,11 @@ namespace LineStatusClient.Forms.History
                     }
                 }
 
-                var chartDay = (ExcelBarChart)ws.Drawings.AddChart("chartDay", eChartType.ColumnStacked);
+                var chartDay = (ExcelBarChart)ws.Drawings.AddChart("chartDay", eChartType.ColumnClustered);
                 chartDay.Title.Text = "Vị trí gọi nhiều trong ngày";
                 chartDay.SetPosition(pivotTitleRow, 0, lastDayCol + 1, 0);
-                chartDay.SetSize(Math.Max(600, days.Count * 30), 420);
+                chartDay.SetSize(Math.Max(600, days.Count * 60), 420);
                 chartDay.GapWidth = 10;
-                chartDay.DataLabel.ShowValue = true;
                 var xRange = ws.Cells[pivotHeaderRow, firstDayCol, pivotHeaderRow, lastDayCol];
                 for (int i = 0; i < monthSummary.Count; i++)
                 {
