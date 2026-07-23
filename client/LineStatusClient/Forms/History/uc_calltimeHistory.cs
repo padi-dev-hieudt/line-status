@@ -469,7 +469,7 @@ namespace LineStatusClient.Forms.History
                 chartMonth.Title.Text = "Vị trí gọi nhiều trong tháng";
                 chartMonth.SetPosition(1, 0, sumCol + 2, 0);
                 chartMonth.SetSize(760, 420);
-                chartMonth.GapWidth = 40;
+                chartMonth.GapWidth = 10;
                 var monthSerie = chartMonth.Series.Add(
                     ws.Cells[3, sumCol + 1, sumLastRow, sumCol + 1],
                     ws.Cells[3, sumCol, sumLastRow, sumCol]);
@@ -508,7 +508,7 @@ namespace LineStatusClient.Forms.History
                 chartDay.Title.Text = "Vị trí gọi nhiều trong ngày";
                 chartDay.SetPosition(pivotTitleRow, 0, lastDayCol + 1, 0);
                 chartDay.SetSize(1200, 520);
-                chartDay.GapWidth = 40;
+                chartDay.GapWidth = 10;
                 var xRange = ws.Cells[pivotHeaderRow, firstDayCol, pivotHeaderRow, lastDayCol];
                 for (int i = 0; i < monthSummary.Count; i++)
                 {
