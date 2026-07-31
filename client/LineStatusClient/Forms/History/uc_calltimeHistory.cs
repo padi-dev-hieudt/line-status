@@ -477,37 +477,71 @@ namespace LineStatusClient.Forms.History
                 monthSerie.Header = "Số lần gọi";
                 chartMonth.Legend.Remove();
 
-                // ===== Bảng theo ngày (pivot: vị trí x ngày) + biểu đồ =====
-                int pivotTitleRow = Math.Max(sumLastRow, 24) + 3;
+                // ===== Bảng theo ngày (pivot: vị trí x ngày, heatmap) + biểu đồ =====
+                int pivotStartCol = sumCol + 2;          // thẳng mép trái biểu đồ tháng
+                int pivotTitleRow = 24;                  // dưới hình biểu đồ tháng (cao 420px ≈ 21 dòng)
                 int pivotHeaderRow = pivotTitleRow + 1;
-                int firstDayCol = sumCol + 1;
-                int lastDayCol = sumCol + days.Count;
+                int firstDayCol = pivotStartCol + 1;
+                int lastDayCol = pivotStartCol + days.Count;
+                int totalCol = lastDayCol + 1;
 
-                ws.Cells[pivotTitleRow, sumCol].Value = "VỊ TRÍ GỌI NHIỀU TRONG NGÀY";
-                ws.Cells[pivotTitleRow, sumCol, pivotTitleRow, lastDayCol].Merge = true;
-                ws.Cells[pivotTitleRow, sumCol].Style.Font.Bold = true;
+                ws.Cells[pivotTitleRow, pivotStartCol].Value = "VỊ TRÍ GỌI NHIỀU TRONG NGÀY";
+                ws.Cells[pivotTitleRow, pivotStartCol, pivotTitleRow, lastDayCol].Merge = true;
+                ws.Cells[pivotTitleRow, pivotStartCol].Style.Font.Bold = true;
 
-                ws.Cells[pivotHeaderRow, sumCol].Value = "Vị trí";
+                ws.Cells[pivotHeaderRow, pivotStartCol].Value = "Vị trí";
                 for (int d = 0; d < days.Count; d++)
                     ws.Cells[pivotHeaderRow, firstDayCol + d].Value = days[d].ToString("dd/MM");
-                StyleHeader(ws.Cells[pivotHeaderRow, sumCol, pivotHeaderRow, lastDayCol]);
+                ws.Cells[pivotHeaderRow, totalCol].Value = "Total";
+                StyleHeader(ws.Cells[pivotHeaderRow, pivotStartCol, pivotHeaderRow, totalCol]);
 
+                var colTotals = new int[days.Count];
                 for (int i = 0; i < monthSummary.Count; i++)
                 {
                     int row = pivotHeaderRow + 1 + i;
                     string pos = monthSummary[i].Position;
-                    ws.Cells[row, sumCol].Value = pos;
+                    ws.Cells[row, pivotStartCol].Value = pos;
+                    int rowTotal = 0;
                     for (int d = 0; d < days.Count; d++)
                     {
                         int count;
                         dayCounts.TryGetValue(new { Position = pos, Day = days[d] }, out count);
                         ws.Cells[row, firstDayCol + d].Value = count;
+                        rowTotal += count;
+                        colTotals[d] += count;
                     }
+                    ws.Cells[row, totalCol].Value = rowTotal;
+                    ws.Cells[row, totalCol].Style.Font.Bold = true;
                 }
+
+                // Dòng Total dưới cùng
+                int totalRow = pivotHeaderRow + monthSummary.Count + 1;
+                ws.Cells[totalRow, pivotStartCol].Value = "Total";
+                int grandTotal = 0;
+                for (int d = 0; d < days.Count; d++)
+                {
+                    ws.Cells[totalRow, firstDayCol + d].Value = colTotals[d];
+                    grandTotal += colTotals[d];
+                }
+                ws.Cells[totalRow, totalCol].Value = grandTotal;
+                StyleHeader(ws.Cells[totalRow, pivotStartCol, totalRow, totalCol]);
+
+                // Heatmap: thang màu xanh trên vùng dữ liệu theo ngày (không gồm Total)
+                var heatRange = ws.Cells[pivotHeaderRow + 1, firstDayCol, pivotHeaderRow + monthSummary.Count, lastDayCol];
+                var scale = ws.ConditionalFormatting.AddTwoColorScale(heatRange);
+                scale.LowValue.Color = Color.White;
+                scale.HighValue.Color = Color.FromArgb(0, 128, 0);
+
+                var pivotRange = ws.Cells[pivotHeaderRow, pivotStartCol, totalRow, totalCol];
+                pivotRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                pivotRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                pivotRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                pivotRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                pivotRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
                 var chartDay = (ExcelBarChart)ws.Drawings.AddChart("chartDay", eChartType.ColumnClustered);
                 chartDay.Title.Text = "Vị trí gọi nhiều trong ngày";
-                chartDay.SetPosition(pivotTitleRow, 0, lastDayCol + 1, 0);
+                chartDay.SetPosition(pivotTitleRow, 0, totalCol + 1, 0);
                 chartDay.SetSize(Math.Max(600, days.Count * 60), 420);
                 chartDay.GapWidth = 10;
                 var xRange = ws.Cells[pivotHeaderRow, firstDayCol, pivotHeaderRow, lastDayCol];
@@ -518,7 +552,7 @@ namespace LineStatusClient.Forms.History
                     serie.Header = monthSummary[i].Position;
                 }
 
-                ws.Cells[1, 1, Math.Max(data.Count + 1, pivotHeaderRow + monthSummary.Count), lastDayCol].AutoFitColumns();
+                ws.Cells[1, 1, Math.Max(data.Count + 1, totalRow), totalCol].AutoFitColumns();
                 pkg.SaveAs(new FileInfo(savePath));
             }
         }
