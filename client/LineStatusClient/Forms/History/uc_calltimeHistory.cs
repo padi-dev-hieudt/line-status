@@ -378,7 +378,7 @@ namespace LineStatusClient.Forms.History
             var waitForm = CreateWaitForm();
             waitForm.Show(this);
 
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 try
                 {
@@ -478,7 +478,7 @@ namespace LineStatusClient.Forms.History
                 chartMonth.Legend.Remove();
 
                 // ===== Bảng theo ngày (pivot: vị trí x ngày, heatmap) + biểu đồ =====
-                int pivotStartCol = sumCol + 2;          // thẳng mép trái biểu đồ tháng
+                int pivotStartCol = sumCol + 3;          // thẳng mép trái biểu đồ tháng
                 int pivotTitleRow = 24;                  // dưới hình biểu đồ tháng (cao 420px ≈ 21 dòng)
                 int pivotHeaderRow = pivotTitleRow + 1;
                 int firstDayCol = pivotStartCol + 1;
@@ -539,6 +539,7 @@ namespace LineStatusClient.Forms.History
                 pivotRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 pivotRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
+                /* Remove chart follow day
                 var chartDay = (ExcelBarChart)ws.Drawings.AddChart("chartDay", eChartType.ColumnClustered);
                 chartDay.Title.Text = "Vị trí gọi nhiều trong ngày";
                 chartDay.SetPosition(pivotTitleRow, 0, totalCol + 1, 0);
@@ -551,6 +552,7 @@ namespace LineStatusClient.Forms.History
                     var serie = chartDay.Series.Add(ws.Cells[row, firstDayCol, row, lastDayCol], xRange);
                     serie.Header = monthSummary[i].Position;
                 }
+                */
 
                 ws.Cells[1, 1, Math.Max(data.Count + 1, totalRow), totalCol].AutoFitColumns();
                 pkg.SaveAs(new FileInfo(savePath));
