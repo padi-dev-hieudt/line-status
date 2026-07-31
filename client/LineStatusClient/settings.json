@@ -1,7 +1,7 @@
 {
-  "ServerName": "127.0.0.1",
+  "ServerName": "(localdb)\\MSSQLLocalDB",
   "DatabaseName": "CallASSYDB",
   "UserName": "sa",
-  "Password": "123456",
+  "Password": "Support@2022",
   "Extra": "TrustServerCertificate=True"
 }
