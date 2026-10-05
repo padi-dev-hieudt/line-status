@@ -146,7 +146,8 @@ namespace LineStatusClient.Forms.History
             var today = DateTime.Today;
             int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
             var monday = today.AddDays(-diff);
-            SetDateRange(monday, today);
+            var sunday = monday.AddDays(6); // End of week
+            SetDateRange(monday, sunday);
             SetChipActive(btnThisWeek);
         }
 
@@ -154,7 +155,8 @@ namespace LineStatusClient.Forms.History
         {
             var today = DateTime.Today;
             var firstDay = new DateTime(today.Year, today.Month, 1);
-            SetDateRange(firstDay, today);
+            var lastDay = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+            SetDateRange(firstDay, lastDay);
             SetChipActive(btnThisMonth);
         }
 
